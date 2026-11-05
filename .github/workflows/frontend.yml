@@ -1,0 +1,62 @@
+# Frontend changes don't touch the recorder, so they deploy on their own.
+name: Frontend
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**", "deploy/docker-compose*.yml", ".github/workflows/frontend.yml"]
+  pull_request:
+    paths: ["frontend/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm exec next typegen && pnpm typecheck
+        working-directory: frontend
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    concurrency: deploy-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set the image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}-frontend:${GITHUB_SHA}" >> "$GITHUB_ENV"
+      - uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,scope=frontend,mode=max
+      - uses: ./.github/actions/deploy
+        with:
+          service: frontend
+          sha: ${{ github.sha }}
+          host: ${{ secrets.VPS_HOST }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          known-hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+          token: ${{ secrets.GITHUB_TOKEN }}

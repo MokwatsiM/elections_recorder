@@ -1,0 +1,30 @@
+# Overrides for a private deployment on a server shared with Coolify. Nothing is
+# published publicly: viewers reach the frontend only through a Cloudflare Tunnel,
+# whose login page is managed in Cloudflare.
+services:
+  postgres:
+    ports: !reset []
+    mem_limit: 1g
+  backend:
+    # Set by lge-deploy in images.env. The default is the image built on the server.
+    image: ${BACKEND_IMAGE:-lge-backend:latest}
+    mem_limit: 1g
+    ports: !override
+      - "127.0.0.1:18080:8080"
+  frontend:
+    image: ${FRONTEND_IMAGE:-lge-frontend:latest}
+    profiles: !override [private]
+    mem_limit: 768m
+    ports: !override
+      - "127.0.0.1:13000:3000"
+    environment:
+      SITE_URL: https://results.mokwatsi.tech
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles: [tunnel]
+    depends_on: [frontend]
+    command: tunnel --no-autoupdate run
+    mem_limit: 256m
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}

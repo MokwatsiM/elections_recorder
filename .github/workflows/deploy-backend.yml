@@ -1,0 +1,34 @@
+# Run by hand from the Actions tab. This restarts the recorder for a few seconds.
+name: Deploy backend
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit SHA to deploy. Blank means the latest commit that changed the backend.
+        required: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency: deploy-backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Choose the commit
+        id: pick
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+        run: echo "sha=${INPUT_SHA:-$(git log -1 --format=%H -- backend)}" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/deploy
+        with:
+          service: backend
+          sha: ${{ steps.pick.outputs.sha }}
+          host: ${{ secrets.VPS_HOST }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          known-hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+          token: ${{ secrets.GITHUB_TOKEN }}

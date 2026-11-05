@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* The results slip: ruled cells on form stock. The interface has no hue of its own,
+   so nothing in it can lean towards a party. Colour belongs to parties, and yellow
+   highlighter marks what just changed. */
+:root {
+  color-scheme: light;
+  --paper: #f3f5f1;
+  --paper-2: #e8ebe5;
+  --cell: #fbfcfa;
+  --ink: #131a17;
+  --ink-2: #47514c;
+  --ink-3: #66716b;
+  --rule: #c3cbc5;
+  --rule-strong: #131a17;
+  --highlight: #ffec7a;
+  --warn-bg: #fff1cc;
+  --warn-ink: #5c4200;
+  --no-result: #dfe3dc;
+  --swing-down: #a8501c;
+  --swing-mid: #d9dcd6;
+  --swing-up: #1d7a7a;
+
+  --p-anc: #0f7b3f;
+  --p-da: #1560bd;
+  --p-eff: #c8202f;
+  --p-ifp: #d69a00;
+  --p-pa: #0a8f9e;
+  --p-actionsa: #8e24aa;
+  --p-vf: #e8650a;
+  --p-mk: #d6188f;
+  --p-other: #8b948e;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #101614;
+  --paper-2: #18201d;
+  --cell: #151c19;
+  --ink: #eef2ef;
+  --ink-2: #b4bdb8;
+  --ink-3: #8f9994;
+  --rule: #323c37;
+  --rule-strong: #eef2ef;
+  --highlight: #5c5310;
+  --warn-bg: #3a2e0a;
+  --warn-ink: #ffdf8a;
+  --no-result: #232c28;
+  --swing-down: #d97c42;
+  --swing-mid: #38423d;
+  --swing-up: #3fb0ae;
+
+  --p-anc: #27a35c;
+  --p-da: #4a8de0;
+  --p-eff: #ec5f66;
+  --p-ifp: #a89514;
+  --p-pa: #22a6b3;
+  --p-actionsa: #ae6ad6;
+  --p-vf: #d66f20;
+  --p-mk: #dc52ac;
+  --p-other: #717b76;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-cell: var(--cell);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --radius-none: 0;
+}
+
+html { background: var(--paper); color: var(--ink); -webkit-text-size-adjust: 100%; }
+body { font-family: var(--font-sans); font-variant-numeric: tabular-nums; font-size: 0.9375rem; line-height: 1.4; min-height: 100dvh; }
+::selection { background: var(--highlight); color: var(--ink); }
+a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+* { scrollbar-color: var(--rule) transparent; }
+
+.display { font-stretch: 88%; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+.label { font-size: 0.75rem; line-height: 1.2; color: var(--ink-2); }
+
+/* A form section: a heavy rule on top, its name, then ruled cells that share borders. */
+.section { border-top: 2px solid var(--rule-strong); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.625rem 0 0.5rem; }
+.section-head h2 { font-stretch: 88%; font-weight: 700; font-size: 1.0625rem; }
+
+.cells { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.cell { background: var(--cell); padding: 0.5rem 0.625rem 0.625rem; min-width: 0; }
+
+/* Character boxes, as on a pre-printed form. An empty box means nothing yet. */
+.comb { display: inline-flex; border: 1px solid var(--rule-strong); background: var(--cell); vertical-align: middle; }
+.comb > span { width: 1.05em; height: 1.45em; display: grid; place-items: center; font-weight: 600; }
+.comb > span + span { border-left: 1px solid var(--rule); }
+.comb > .gap { border-left-color: var(--ink-3); }
+
+.meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; height: 0.75rem; }
+.meter > i { background: var(--no-result); }
+.meter > i.on { background: var(--ink); }
+
+.mark-changed { animation: highlighter 2.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes highlighter {
+  0%, 35% { background-color: var(--highlight); }
+  100% { background-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-changed { animation: none; }
+  * { scroll-behavior: auto !important; }
+}
+
+.tag { display: inline-flex; align-items: center; gap: 0.25rem; border: 1px solid currentColor; padding: 0 0.3125rem; font-size: 0.75rem; font-weight: 600; line-height: 1.35; white-space: nowrap; }
+.tag.hung { border-style: dashed; }
+.tag.pending { color: var(--ink-3); border-color: var(--rule); font-weight: 500; }
+.tag.majority { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.swatch { display: inline-block; width: 0.625rem; height: 0.625rem; flex: none; }
+
+table.ledger { width: 100%; border-collapse: collapse; }
+table.ledger th { text-align: left; font-weight: 500; font-size: 0.75rem; color: var(--ink-2); padding: 0.375rem 0.5rem; border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
+table.ledger td { padding: 0.4375rem 0.5rem; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+table.ledger .n { text-align: right; }
+table.ledger tbody tr:hover { background: var(--paper-2); }
+table.ledger button.sort { font: inherit; color: inherit; cursor: pointer; }
+table.ledger button.sort:hover { color: var(--ink); text-decoration: underline; }
+
+.btn { display: inline-flex; align-items: center; gap: 0.375rem; border: 1px solid var(--rule); background: var(--cell); padding: 0.25rem 0.5rem; font-size: 0.8125rem; cursor: pointer; transition: border-color 150ms, background-color 150ms; }
+.btn:hover { border-color: var(--ink); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn[aria-pressed="true"], .btn[aria-current="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.input { border: 1px solid var(--rule); background: var(--cell); padding: 0.3125rem 0.5rem; width: 100%; }
+.input::placeholder { color: var(--ink-3); }
+.input:focus { outline: none; border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+
+.skeleton { background: var(--paper-2); }
+.maplibregl-canvas { outline: none; }
+.maplibregl-ctrl-attrib { display: none; }
+.maplibregl-cooperative-gesture-screen { background: rgba(19, 26, 23, 0.6) !important; font-size: 0.875rem !important; }

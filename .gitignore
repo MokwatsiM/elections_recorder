@@ -1,0 +1,12 @@
+.env
+node_modules/
+.next/
+*.pmtiles
+backend/bin/
+tiles/raw/
+frontend/public/maplibre-gl-worker.mjs
+.next-replay/
+backups/
+*.tsbuildinfo
+.claude/
+*.dump

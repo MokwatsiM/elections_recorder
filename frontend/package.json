@@ -1,0 +1,31 @@
+{
+  "name": "lge-dashboard-frontend",
+  "private": true,
+  "scripts": {
+    "copy-worker": "cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre-gl-worker.mjs",
+    "predev": "pnpm copy-worker",
+    "prebuild": "pnpm copy-worker",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5",
+    "lucide-react": "^0.500.0",
+    "maplibre-gl": "^6",
+    "next": "^16.4.5",
+    "pmtiles": "^4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.32.1"
+}

@@ -1,0 +1,61 @@
+name: lge
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lge}
+      POSTGRES_DB: lge
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lge -d lge"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ../backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://lge:${POSTGRES_PASSWORD:-lge}@postgres:5432/lge?sslmode=disable
+      IEC_USER_AGENT: ${IEC_USER_AGENT:-}
+      TRUST_PROXY: ${TRUST_PROXY:-false} # true only when Caddy and Cloudflare are in front
+    volumes:
+      - ../tiles/sa.pmtiles:/data/tiles/sa.pmtiles:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  frontend:
+    build: ../frontend
+    restart: unless-stopped
+    profiles: [public]
+    depends_on: [backend]
+    environment:
+      BACKEND_URL: http://backend:8080
+      SITE_URL: ${SITE_URL:-http://localhost}
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    profiles: [public]
+    depends_on: [frontend, backend]
+    environment:
+      SITE_HOST: ${SITE_HOST:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  pgdata:
+  caddy_data:

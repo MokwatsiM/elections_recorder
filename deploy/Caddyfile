@@ -1,0 +1,28 @@
+{$SITE_HOST::80} {
+	# Directly to the backend: streaming and Range requests shouldn't pass through Next.
+	handle /api/v1/stream {
+		reverse_proxy backend:8080 {
+			flush_interval -1
+		}
+	}
+	handle /tiles/* {
+		reverse_proxy backend:8080
+	}
+	handle /api/* {
+		encode zstd gzip
+		reverse_proxy backend:8080
+	}
+	handle {
+		encode zstd gzip
+		reverse_proxy frontend:3000
+	}
+	# Metrics stay private.
+	respond /metrics 404
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		-Server
+	}
+}
