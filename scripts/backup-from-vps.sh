@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copies a full database backup from the VPS to backups/ on this machine.
-#   scripts/backup-from-vps.sh root@187.127.231.242
+#   scripts/backup-from-vps.sh root@your-server
 set -euo pipefail
 
 REMOTE="${1:?usage: backup-from-vps.sh user@host}"

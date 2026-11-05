@@ -3,7 +3,7 @@
 # and stores what the workflows need as GitHub secrets. Safe to run again, which also
 # replaces the key. Needs gh logged in, and run from inside the repo.
 #
-#   scripts/install-deploy-key.sh root@187.127.231.242
+#   scripts/install-deploy-key.sh root@your-server
 set -euo pipefail
 
 REMOTE="${1:?usage: install-deploy-key.sh user@host}"

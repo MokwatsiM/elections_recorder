@@ -91,7 +91,7 @@ The frontend also runs on the VPS, with no public port. It's reached only throug
 Back up the recording to this machine:
 
 ```bash
-scripts/backup-from-vps.sh root@187.127.231.242
+scripts/backup-from-vps.sh root@your-server
 ```
 
 ## CI/CD
@@ -102,7 +102,7 @@ Pushing to `main` runs GitHub Actions, which builds Docker images into the GitHu
 - **Backend:** tests and builds automatically, but deploys only when you run the "Deploy backend" workflow, because that restarts the recorder.
 - **Rollback:** a deploy that fails its health check goes back to the previous image by itself. To go back later, run the workflow again with an older commit SHA, or re-run an older frontend run.
 
-The deploy key can only run `deploy/lge-deploy.sh` on the server. Run `scripts/install-deploy-key.sh root@187.127.231.242` to set it up or replace it, and again after changing that script. `.env` and `tiles/sa.pmtiles` stay on the server and aren't in git.
+The deploy key can only run `deploy/lge-deploy.sh` on the server. Run `scripts/install-deploy-key.sh root@your-server` to set it up or replace it, and again after changing that script. `.env` and `tiles/sa.pmtiles` stay on the server and aren't in git.
 
 ## How the data works
 

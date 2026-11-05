@@ -2,7 +2,7 @@
 # Moves the recorder from this machine to a VPS, keeping everything recorded so far.
 # It adds a "lge" Docker project in /opt/lge and doesn't touch anything else there.
 #
-#   scripts/move-recorder-to-vps.sh root@187.127.231.242
+#   scripts/move-recorder-to-vps.sh root@your-server
 #
 # The local recorder stops only for the handover. If the handover fails, it restarts.
 set -euo pipefail
